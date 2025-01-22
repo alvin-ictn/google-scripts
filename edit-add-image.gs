@@ -1,4 +1,4 @@
-function myFunc() {
+function removeImage() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet();
   SpreadsheetApp.setActiveSheet(sheet.getSheets()[4]);
 
@@ -10,8 +10,6 @@ function myFunc() {
 }
 
 function onEdit(e) {
-  Logger.log("LOGGER E", e.range.getColumn(), e.range.getRow());
-
   var sheet = e.source.getActiveSheet();
   var range = e.range; // The range that was edited
   var newValue = e.value; // The new value entered
@@ -32,9 +30,6 @@ function onEdit(e) {
     // If the new value is not "Insert Image", remove the image
     var images = sheet.getImages(); // Get all images on the sheet
     var imageToRemove = null;
-
-    console.log("CON I", images)
-    Logger.log("LOG I", images)
 
     // Loop through the images to find the one in the edited cell
     for (var i = 0; i < images.length; i++) {
