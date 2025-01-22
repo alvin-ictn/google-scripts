@@ -1,6 +1,6 @@
 function removeImage(cell) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet();
-    const sheetg = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const sheetg = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
   if (sheet.getActiveSheet().getName !== "Calendar") {
     SpreadsheetApp.setActiveSheet(sheet.getSheets()[4]);
@@ -19,13 +19,30 @@ function removeImage(cell) {
     sheet.getColumnWidth(dummy.getAnchorCell().getColumn()),
     sheet.getRowHeight(dummy.getAnchorCell().getRow()),
     dummy.getAnchorCell().getHeight(),
-    dummy.getAnchorCell().getCell(1,1).getWidth(),
+    dummy.getAnchorCell().getCell(1, 1).getWidth(),
     dummy.getHeight(),
     dummy.getWidth(),
     dummy.getAnchorCellXOffset(),
     dummy.getAnchorCellYOffset())
   dummy.setAnchorCellXOffset(0)
   dummy.setAnchorCellYOffset(0)
+}
+
+function adjustImage(images, target, sheet) {
+  console.log("TEST", images, target)
+  for (var i = 0; i < images.length; i++) {
+    var img = images[i];
+    let imgCell = img.getAnchorCell().getA1Notation()
+
+    // Check if the image is in the edited cell
+    if (imgCell === target) {
+      console.log("TARGET", sheet.getColumnWidth(img.getAnchorCell().getColumn()))
+      img.setAnchorCellXOffset(sheet.getColumnWidth(img.getAnchorCell().getColumn()) - img.getHeight())
+      img.setAnchorCellYOffset(0)
+      break;
+    }
+  }
+
 }
 
 function onEdit(e) {
@@ -35,22 +52,23 @@ function onEdit(e) {
 
   // Define the image URL
   let wishCoinImg = 'https://supersnail.wiki.gg/images/thumb/2/2a/Wish_Coin.png/30px-Wish_Coin.png';
-
+  let lotteryTicketImg = 'https://supersnail.wiki.gg/images/thumb/8/85/Lottery_Ticket.png/30px-Lottery_Ticket.png'
   // Check if the new value is "Insert Image"
 
-  console.log("CHECK IMAGE", sheet.getImages().length);
-  Logger.log("LOG IMAGE", sheet.getImages().length);
+  // console.log("CHECK IMAGE", sheet.getImages().length);
+  // Logger.log("LOG IMAGE", sheet.getImages().length);
 
   if (newValue === 'Insert Image') {
-    Logger.log("Inserting image for value: " + newValue);
+    // Logger.log("Inserting image for value: " + newValue);
 
     // Fetch the image as a blob
     var imageBlob = UrlFetchApp.fetch(wishCoinImg).getBlob();
 
     // Insert the image over the edited cell
     sheet.insertImage(imageBlob, range.getColumn(), range.getRow());
+    adjustImage(sheet.getImages(), range.getA1Notation(), sheet)
   } else {
-    console.log("RANGE", range.getA1Notation(), sheet)
+    // console.log("RANGE", range.getA1Notation(), sheet)
     // removeImage(range.getA1Notation())
     // If the new value is not "Insert Image", remove the image
     var images = sheet.getImages(); // Get all images on the sheet
