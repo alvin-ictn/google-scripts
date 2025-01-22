@@ -5,7 +5,6 @@ function adjustImage(images, target, sheet) {
 
     // Check if the image is in the edited cell
     if (imgCell === target) {
-      console.log("TARGET", sheet.getColumnWidth(img.getAnchorCell().getColumn()))
       img.setAnchorCellXOffset(sheet.getColumnWidth(img.getAnchorCell().getColumn()) - img.getWidth())
       img.setAnchorCellYOffset(0)
       break;
