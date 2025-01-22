@@ -29,7 +29,6 @@ function removeImage(cell) {
 }
 
 function adjustImage(images, target, sheet) {
-  console.log("TEST", images, target)
   for (var i = 0; i < images.length; i++) {
     var img = images[i];
     let imgCell = img.getAnchorCell().getA1Notation()
@@ -37,7 +36,7 @@ function adjustImage(images, target, sheet) {
     // Check if the image is in the edited cell
     if (imgCell === target) {
       console.log("TARGET", sheet.getColumnWidth(img.getAnchorCell().getColumn()))
-      img.setAnchorCellXOffset(sheet.getColumnWidth(img.getAnchorCell().getColumn()) - img.getHeight())
+      img.setAnchorCellXOffset(sheet.getColumnWidth(img.getAnchorCell().getColumn()) - img.getWidth())
       img.setAnchorCellYOffset(0)
       break;
     }
@@ -48,9 +47,14 @@ function adjustImage(images, target, sheet) {
 function onEdit(e) {
   var sheet = e.source.getActiveSheet();
   var range = e.range; // The range that was edited
-  var newValue = e.value; // The new value entered
+  var newValue = e.value ?? e.range.getValue(); // The new value entered
 
   // Define the image URL
+  const imgBank = {
+    "Wishing Week": 'https://supersnail.wiki.gg/images/thumb/2/2a/Wish_Coin.png/30px-Wish_Coin.png',
+    "Lottery Week": 'https://supersnail.wiki.gg/images/thumb/8/85/Lottery_Ticket.png/30px-Lottery_Ticket.png',
+    "Offering Week": "https://supersnail.wiki.gg/images/thumb/e/e1/Soul_I.png/30px-Soul_I.png"
+  }
   let wishCoinImg = 'https://supersnail.wiki.gg/images/thumb/2/2a/Wish_Coin.png/30px-Wish_Coin.png';
   let lotteryTicketImg = 'https://supersnail.wiki.gg/images/thumb/8/85/Lottery_Ticket.png/30px-Lottery_Ticket.png'
   // Check if the new value is "Insert Image"
@@ -58,11 +62,11 @@ function onEdit(e) {
   // console.log("CHECK IMAGE", sheet.getImages().length);
   // Logger.log("LOG IMAGE", sheet.getImages().length);
 
-  if (newValue === 'Insert Image') {
+  if (["Lottery Week", "Wishing Week", "Offering Week"].includes(newValue)) {
     // Logger.log("Inserting image for value: " + newValue);
 
     // Fetch the image as a blob
-    var imageBlob = UrlFetchApp.fetch(wishCoinImg).getBlob();
+    var imageBlob = UrlFetchApp.fetch(imgBank[newValue]).getBlob();
 
     // Insert the image over the edited cell
     sheet.insertImage(imageBlob, range.getColumn(), range.getRow());
