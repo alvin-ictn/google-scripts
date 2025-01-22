@@ -1,33 +1,3 @@
-function removeImage(cell) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet();
-  const sheetg = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-
-  if (sheet.getActiveSheet().getName !== "Calendar") {
-    SpreadsheetApp.setActiveSheet(sheet.getSheets()[4]);
-  }
-
-  for (i = 0; i < sheet.getImages().length; i++) {
-    let img = sheet.getImages()[i]
-    // if(cell === img.getAnchorCell().getA1Notation()) {
-    //   img.remove()
-    // }
-  }
-
-  const dummy = sheet.getImages()[0];
-  console.log(
-    dummy.getAnchorCell().getA1Notation(),
-    sheet.getColumnWidth(dummy.getAnchorCell().getColumn()),
-    sheet.getRowHeight(dummy.getAnchorCell().getRow()),
-    dummy.getAnchorCell().getHeight(),
-    dummy.getAnchorCell().getCell(1, 1).getWidth(),
-    dummy.getHeight(),
-    dummy.getWidth(),
-    dummy.getAnchorCellXOffset(),
-    dummy.getAnchorCellYOffset())
-  dummy.setAnchorCellXOffset(0)
-  dummy.setAnchorCellYOffset(0)
-}
-
 function adjustImage(images, target, sheet) {
   for (var i = 0; i < images.length; i++) {
     var img = images[i];
