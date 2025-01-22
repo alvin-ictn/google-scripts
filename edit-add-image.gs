@@ -24,12 +24,6 @@ function onEdit(e) {
     "Lottery Week": 'https://supersnail.wiki.gg/images/thumb/8/85/Lottery_Ticket.png/30px-Lottery_Ticket.png',
     "Offering Week": "https://supersnail.wiki.gg/images/thumb/e/e1/Soul_I.png/30px-Soul_I.png"
   }
-  let wishCoinImg = 'https://supersnail.wiki.gg/images/thumb/2/2a/Wish_Coin.png/30px-Wish_Coin.png';
-  let lotteryTicketImg = 'https://supersnail.wiki.gg/images/thumb/8/85/Lottery_Ticket.png/30px-Lottery_Ticket.png'
-  // Check if the new value is "Insert Image"
-
-  // console.log("CHECK IMAGE", sheet.getImages().length);
-  // Logger.log("LOG IMAGE", sheet.getImages().length);
 
   if (["Lottery Week", "Wishing Week", "Offering Week"].includes(newValue)) {
     // Logger.log("Inserting image for value: " + newValue);
