@@ -170,7 +170,6 @@
       };
 
       function modifySheetData(data) {
-        console.log(typeof data);
         let parsedData = typeof data === "object" ? data : JSON.parse(data);
         // Example 1: Remove the first row (headers)
         let headers = parsedData[0]; // Keep headers for the table
@@ -456,8 +455,7 @@
         baseHeaders = headers;
         baseBody = bodyData;
         baseKeyEvent = keyEvent;
-        console.log("");
-
+        
         const monthIdx = getMonthRangeIndex(
           baseHeaders,
           toTwoDigits(month),
@@ -605,7 +603,6 @@
 
           startIndex = monthIdx.startIndex;
           endIndex = monthIdx.endIndex;
-          console.log("START", monthIdx);
           let { hd, bd } = filterData(
             baseHeaders,
             baseBody,
