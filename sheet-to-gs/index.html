@@ -448,13 +448,33 @@
         />
       </button>
     </div>
-    <div>
-        <select id="weekSelect">
-            <option value="week">4 Weeks</option>
-            <option value="full">Full Week</option>
-        </select>
+    <div class="tooltip-container relative">
+      <select
+        id="weekSelect"
+        class="border border-[#6e5e55] rounded-md p-2 cursor-pointer"
+        onmouseover="showTooltip()"
+        onmouseout="hideTooltip()"
+      >
+        <option value="full">Full Week</option>
+        <option value="week">4 Weeks</option>
+      </select>
+      <div
+        id="tooltip"
+        class="absolute invisible p-2 bg-[#d4b28b] top-[5px] left-[110px] rounded-md border-[2px] border-[#6e5e55]"
+      >
+        <ul>
+          <li>
+            <span><b>Full Week</b> - will show all week in single month</span>
+          </li>
+          <li>
+            <span><b>4 Weeks</b> - will show only 4 weeks in single month</span>
+          </li>
+        </ul>
+      </div>
     </div>
-    <!-- <div class="relative"><img class="absolute bottom-[-2px]"id="reporter" /> </div> -->
+    <div class="relative">
+      <img class="absolute bottom-[-2px]" id="reporter" />
+    </div>
     <table class="border border-1">
       <thead id="tableHead"></thead>
       <tbody id="tableBody"></tbody>
@@ -465,31 +485,43 @@
       let thead = document.getElementById("tableHead");
       let tbody = document.getElementById("tableBody");
 
-      document.getElementById("weekSelect").addEventListener("change", function() {
-        monthMode = this.value;
-        const monthIdx = getMonthRangeIndex(
-          baseHeaders,
-          toTwoDigits(month),
-          this.value
-        );
+      document
+        .getElementById("weekSelect")
+        .addEventListener("change", function () {
+          monthMode = this.value;
+          const monthIdx = getMonthRangeIndex(
+            baseHeaders,
+            toTwoDigits(month),
+            this.value
+          );
 
-        startIndex = monthIdx.startIndex;
-        endIndex = monthIdx.endIndex;
-        console.log("START", monthIdx)
-        let { hd, bd } = filterData(
-          baseHeaders,
-          baseBody,
-          monthIdx.startIndex,
-          monthIdx.endIndex + 1
-        );
+          startIndex = monthIdx.startIndex;
+          endIndex = monthIdx.endIndex;
+          console.log("START", monthIdx);
+          let { hd, bd } = filterData(
+            baseHeaders,
+            baseBody,
+            monthIdx.startIndex,
+            monthIdx.endIndex + 1
+          );
 
-        const { hElem, bElem } = generateHTMLElem(hd, bd, baseKeyEvent);
+          const { hElem, bElem } = generateHTMLElem(hd, bd, baseKeyEvent);
 
-        thead.innerHTML = hElem;
-        tbody.innerHTML = bElem;
-      })
+          thead.innerHTML = hElem;
+          tbody.innerHTML = bElem;
+        });
 
-      //   document.getElementById("reporter").src= reporter;
+      function showTooltip() {
+        document.getElementById("tooltip").style.visibility = "visible";
+        document.getElementById("tooltip").style.opacity = "1";
+      }
+
+      function hideTooltip() {
+        document.getElementById("tooltip").style.visibility = "hidden";
+        document.getElementById("tooltip").style.opacity = "0";
+      }
+
+      document.getElementById("reporter").src = reporter;
       document.getElementById("next").addEventListener("click", function () {
         month = month < 12 ? month + 1 : month;
         const monthIdx = getMonthRangeIndex(
