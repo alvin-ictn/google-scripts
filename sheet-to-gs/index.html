@@ -19,7 +19,7 @@
       const speciesWar = {
         goldfish:
           "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/goldfish.webp",
-        "dung bettles":
+        "dung beetles":
           "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/dung%20beetles.webp",
         hamster:
           "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/hamster.webp",
@@ -106,7 +106,7 @@
           return { hElem: null, bElem: null };
         }
         const headDLength = headD.length - 1;
-        let width = (window.innerWidth - 132) / headDLength
+        let width = (window.innerWidth - 132) / headDLength;
 
         let tHead = headD
           ?.map(
@@ -118,18 +118,30 @@
           .join("");
 
         let realBody = key.map((header, index) => [header, ...bodyD[index]]);
+        let columnRowspan = Array(realBody[0].length).fill(1); // Track rowspan for each column
 
         let tBody = realBody.map((row, rowIdx) => {
           return `<tr>${row
             .map((cell, cellIdx) => {
               //   console.log(cellIdx === 0 ? cell : "NON");
-              return `<td class="border p-1">${
-                Object.keys(weekly).includes(cell)
-                  ? `<img class="weekly-banner" src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>`
-                  : `<p class="${
-                      cellIdx === 0 && "text-lg font-semibold"
-                    }">${cell}</p>`
-              }</td>`;
+              //   let combinedCell = rowIdx === 2 ? cell
+              console.log(rowIdx, cellIdx, cell);
+              return `<td class="border p-1" ${
+                rowIdx === 2 && `rowspan=${realBody.length - 2}`
+              }>
+                ${
+                  Object.keys(weekly).includes(cell)
+                    ? `<img class="weekly-banner" src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>`
+                    : Object.keys(speciesWar)
+                        .map((r) => r.toLocaleLowerCase())
+                        .includes(cell.toLocaleLowerCase())
+                    ? `<img class="weekly-banner relative bottom-[-4px]" src="${
+                        speciesWar[cell.toLocaleLowerCase()]
+                      }" alt="${cell}-${rowIdx}-${cellIdx}"/>`
+                    : `<p class="${
+                        cellIdx === 0 && "text-lg font-semibold"
+                      }">${cell}${rowIdx}${cellIdx}</p>`
+                }</td>`;
             })
             .join("")}</tr>`;
         });
@@ -412,29 +424,42 @@
             "",
           ],
         ];
+        data[3] = data[3].map((cell, col) =>
+          col === 0
+            ? cell
+            : [
+                cell,
+                ...data
+                  .slice(4)
+                  .map((row) => row[col])
+                  .filter(Boolean),
+              ].join(" | ")
+        );
 
+        // Keep only the first 4 rows
+        data.length = 4;
         let { headers, bodyData, keyEvent } = modifySheetData(data); // Modify data
 
         baseHeaders = headers;
         baseBody = bodyData;
         baseKeyEvent = keyEvent;
-        console.log("")
+        console.log("");
 
         const monthIdx = getMonthRangeIndex(
-            baseHeaders,
-            toTwoDigits(month),
-            monthMode
-          );
+          baseHeaders,
+          toTwoDigits(month),
+          monthMode
+        );
 
-          startIndex = monthIdx.startIndex;
-          endIndex = monthIdx.endIndex;
+        startIndex = monthIdx.startIndex;
+        endIndex = monthIdx.endIndex;
 
-          let { hd, bd } = filterData(
-            baseHeaders,
-            baseBody,
-            monthIdx.startIndex,
-            monthIdx.endIndex + 1
-          );
+        let { hd, bd } = filterData(
+          baseHeaders,
+          baseBody,
+          monthIdx.startIndex,
+          monthIdx.endIndex + 1
+        );
 
         // document.querySelector("#currentMonth").html = `${}`
         const { hElem, bElem } = generateHTMLElem(hd, bd, keyEvent);
@@ -471,7 +496,7 @@
         onmouseover="showTooltip()"
         onmouseout="hideTooltip()"
       >
-      <option value="week">4 Weeks</option>
+        <option value="week">4 Weeks</option>
         <option value="full">Full Week</option>
       </select>
       <div
