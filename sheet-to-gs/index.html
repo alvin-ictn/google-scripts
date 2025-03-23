@@ -70,12 +70,12 @@
               (startMonth === targetMonth && startIndex === -1) ||
               (endMonth === targetMonth && startIndex === -1)
             ) {
-              startIndex = i;
+              startIndex = i - 1;
             }
 
             // Find the last occurrence of the target month
             if (startMonth === targetMonth || endMonth === targetMonth) {
-              endIndex = i;
+              endIndex = i - 1;
             }
           }
         }
@@ -450,7 +450,7 @@
     </div>
     <div>
         <select id="weekSelect">
-            <option value="week">4 Week</option>
+            <option value="week">4 Weeks</option>
             <option value="full">Full Week</option>
         </select>
     </div>
