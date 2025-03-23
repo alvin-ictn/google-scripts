@@ -138,9 +138,20 @@
                     : cell.includes("|")
                     ? `<ul class="list-disc ml-4 flex flex-col gap-2">${cell
                         .split("|")
-                        .map((li) => `<li><div class="${(cellIdx > 0 && cell !== "") && "p-3 border-2 border-[#cc8a68] bg-[#fae7ad] rounded-md"}">${li}</div></li>`)
+                        .map(
+                          (li) =>
+                            `<li><div class="${
+                              cellIdx > 0 &&
+                              cell !== "" &&
+                              "p-3 border-2 border-[#cc8a68] bg-[#fae7ad] rounded-md"
+                            }">${li}</div></li>`
+                        )
                         .join("")}</ul>`
-                    : `<div class="${(cellIdx > 0 && cell !== "") && "p-3 border-2 border-[#cc8a68] bg-[#fae7ad] rounded-md"}"><p class="${
+                    : `<div class="${
+                        cellIdx > 0 &&
+                        cell !== "" &&
+                        "p-3 border-2 border-[#cc8a68] bg-[#fae7ad] rounded-md"
+                      }"><p class="${
                         cellIdx === 0 && "text-lg font-semibold"
                       }">${cell}</p></div>`
                 }</td>`;
@@ -473,69 +484,76 @@
   </head>
 
   <body onload="renderTable()">
-    <div class="flex w-[300px] justify-between">
-      <button
-        id="prev"
-        class="transition-transform duration-300 hover:scale-110 cursor-pointer w-[100px]"
-      >
-        <img
-          src="https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/prev_2.webp"
-        />
-      </button>
-      <button
-        id="next"
-        class="transition-transform duration-300 hover:scale-110 cursor-pointer w-[100px]"
-      >
-        <img
-          src="https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/next_2.webp"
-        />
-      </button>
-    </div>
-    <div class="tooltip-container relative">
-      <div class="relative">
-        <label>Calendar show</label>
-        <select
-          id="weekSelect"
-          class="border border-[#6e5e55] rounded-md p-2 cursor-pointer"
-          onmouseover="showTooltip()"
-          onmouseout="hideTooltip()"
+    <div class="flex items-center flex-col gap-2">
+      <div class="flex w-[300px] justify-between">
+        <button
+          id="prev"
+          class="transition-transform duration-300 hover:scale-110 cursor-pointer w-[100px]"
         >
-          <option value="week">4 Weeks</option>
-          <option value="full">Full Week</option>
-        </select>
+          <img
+            src="https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/prev_2.webp"
+          />
+        </button>
+        <button
+          id="next"
+          class="transition-transform duration-300 hover:scale-110 cursor-pointer w-[100px]"
+        >
+          <img
+            src="https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/next_2.webp"
+          />
+        </button>
       </div>
-      <div class="flex gap-4" id="shift-container">
-        <p>Shift</p>
-        <div class="flex gap-2">
-          <button
-            class="px-2 border border-[#6e5e55] bg-[#d4b28b] rounded-md cursor-pointer"
-            id="shift-left"
+      <div class="tooltip-container relative">
+        <div class="relative">
+          <label>Calendar show</label>
+          <select
+            id="weekSelect"
+            class="border border-[#6e5e55] rounded-md p-2 cursor-pointer"
+            onmouseover="showTooltip()"
+            onmouseout="hideTooltip()"
           >
-            ❰
-          </button>
-          <button
-            class="px-2 border border-[#6e5e55] bg-[#d4b28b] rounded-md cursor-pointer"
-            id="shift-right"
-          >
-            ❱
-          </button>
+            <option value="week">4 Weeks</option>
+            <option value="full">Full Week</option>
+          </select>
+        </div>
+        <div class="flex gap-4" id="shift-container">
+          <p>Shift</p>
+          <div class="flex gap-2">
+            <button
+              class="px-2 border border-[#6e5e55] bg-[#d4b28b] rounded-md cursor-pointer"
+              id="shift-left"
+            >
+              ❰
+            </button>
+            <button
+              class="px-2 border border-[#6e5e55] bg-[#d4b28b] rounded-md cursor-pointer"
+              id="shift-right"
+            >
+              ❱
+            </button>
+          </div>
+        </div>
+        <div
+          id="tooltip"
+          class="absolute invisible p-2 bg-[#d4b28b] top-[5px] left-[210px] rounded-md border-[2px] border-[#6e5e55] w-full z-10"
+        >
+          <ul>
+            <li>
+              <span><b>Full Week</b> - will show all week in single month</span>
+            </li>
+            <li>
+              <span
+                ><b>4 Weeks</b> - will show only 4 weeks in single month</span
+              >
+            </li>
+          </ul>
         </div>
       </div>
-      <div
-        id="tooltip"
-        class="absolute invisible p-2 bg-[#d4b28b] top-[5px] left-[210px] rounded-md border-[2px] border-[#6e5e55]"
-      >
-        <ul>
-          <li>
-            <span><b>Full Week</b> - will show all week in single month</span>
-          </li>
-          <li>
-            <span><b>4 Weeks</b> - will show only 4 weeks in single month</span>
-          </li>
-        </ul>
-      </div>
     </div>
-    <div class="relative flex flex-col bg-[#f7efe4] border-4 rounded-xl m-2 border-[#6e5e55]">
+
+    <div
+      class="relative flex flex-col bg-[#f7efe4] border-4 rounded-xl m-2 border-[#6e5e55]"
+    >
       <!-- Image and Title Container -->
       <div class="relative flex flex-col items-center">
         <img class="relative" id="reporter" />
