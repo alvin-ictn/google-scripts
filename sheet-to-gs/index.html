@@ -138,9 +138,9 @@
                     ? `<img class="weekly-banner relative bottom-[-4px]" src="${
                         speciesWar[cell.toLocaleLowerCase()]
                       }" alt="${cell}-${rowIdx}-${cellIdx}"/>`
-                    : `<p class="${
+                    : cell.includes("|") ? `<ul class="list-disc ml-4">${cell.split("|").map((li) => `<li>${li}</li>`).join("")}</ul>` : `<p class="${
                         cellIdx === 0 && "text-lg font-semibold"
-                      }">${cell}${rowIdx}${cellIdx}</p>`
+                      }">${cell}</p>`
                 }</td>`;
             })
             .join("")}</tr>`;
