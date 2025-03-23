@@ -47,7 +47,8 @@
         monthMode = "week",
         baseHeaders = null,
         baseBody = null,
-        baseKeyEvent = null;
+        baseKeyEvent = null,
+        shiftNum = 0;
 
       function getMonthRangeIndex(data, targetMonth, mode = "full") {
         let startIndex = -1,
@@ -138,7 +139,12 @@
                     ? `<img class="weekly-banner relative bottom-[-4px]" src="${
                         speciesWar[cell.toLocaleLowerCase()]
                       }" alt="${cell}-${rowIdx}-${cellIdx}"/>`
-                    : cell.includes("|") ? `<ul class="list-disc ml-4">${cell.split("|").map((li) => `<li>${li}</li>`).join("")}</ul>` : `<p class="${
+                    : cell.includes("|")
+                    ? `<ul class="list-disc ml-4">${cell
+                        .split("|")
+                        .map((li) => `<li>${li}</li>`)
+                        .join("")}</ul>`
+                    : `<p class="${
                         cellIdx === 0 && "text-lg font-semibold"
                       }">${cell}</p>`
                 }</td>`;
@@ -490,18 +496,38 @@
       </button>
     </div>
     <div class="tooltip-container relative">
-      <select
-        id="weekSelect"
-        class="border border-[#6e5e55] rounded-md p-2 cursor-pointer"
-        onmouseover="showTooltip()"
-        onmouseout="hideTooltip()"
-      >
-        <option value="week">4 Weeks</option>
-        <option value="full">Full Week</option>
-      </select>
+      <div class="relative">
+        <label>Calendar show</label>
+        <select
+          id="weekSelect"
+          class="border border-[#6e5e55] rounded-md p-2 cursor-pointer"
+          onmouseover="showTooltip()"
+          onmouseout="hideTooltip()"
+        >
+          <option value="week">4 Weeks</option>
+          <option value="full">Full Week</option>
+        </select>
+      </div>
+      <div class="flex gap-4" id="shift-container">
+        <p>Shift</p>
+        <div class="flex gap-2">
+          <button
+            class="px-2 border border-[#6e5e55] bg-[#d4b28b] rounded-md cursor-pointer"
+            id="shift-left"
+          >
+            ❰
+          </button>
+          <button
+            class="px-2 border border-[#6e5e55] bg-[#d4b28b] rounded-md cursor-pointer"
+            id="shift-right"
+          >
+            ❱
+          </button>
+        </div>
+      </div>
       <div
         id="tooltip"
-        class="absolute invisible p-2 bg-[#d4b28b] top-[5px] left-[110px] rounded-md border-[2px] border-[#6e5e55]"
+        class="absolute invisible p-2 bg-[#d4b28b] top-[5px] left-[210px] rounded-md border-[2px] border-[#6e5e55]"
       >
         <ul>
           <li>
@@ -538,10 +564,24 @@
     <script>
       let thead = document.getElementById("tableHead");
       let tbody = document.getElementById("tableBody");
+      let shiftContainer = document.getElementById("shift-container");
+      let shiftLeft = document.getElementById("shift-left");
+      let shiftRight = document.getElementById("shift-right");
+
+      if (monthMode === "full") {
+        shiftContainer.style.display = "none";
+      } else {
+        shiftContainer.style.display = "flex"; // or "flex" if they are flex items
+      }
 
       document
         .getElementById("weekSelect")
         .addEventListener("change", function () {
+          if (this.value === "full") {
+            shiftContainer.style.display = "none";
+          } else {
+            shiftContainer.style.display = "flex"; // or "flex" if they are flex items
+          }
           monthMode = this.value;
           const monthIdx = getMonthRangeIndex(
             baseHeaders,
@@ -576,6 +616,53 @@
       }
 
       document.getElementById("reporter").src = reporter;
+
+      shiftLeft.addEventListener("click", function () {
+        shiftNum -= 1;
+        const monthIdx = getMonthRangeIndex(
+          baseHeaders,
+          toTwoDigits(month),
+          monthMode
+        );
+
+        startIndex = monthIdx.startIndex;
+        endIndex = monthIdx.endIndex;
+
+        let { hd, bd } = filterData(
+          baseHeaders,
+          baseBody,
+          monthIdx.startIndex + shiftNum,
+          monthIdx.endIndex + 1 + shiftNum
+        );
+
+        const { hElem, bElem } = generateHTMLElem(hd, bd, baseKeyEvent);
+
+        thead.innerHTML = hElem;
+        tbody.innerHTML = bElem;
+      });
+      shiftRight.addEventListener("click", function () {
+        shiftNum += 1;
+        const monthIdx = getMonthRangeIndex(
+          baseHeaders,
+          toTwoDigits(month),
+          monthMode
+        );
+
+        startIndex = monthIdx.startIndex;
+        endIndex = monthIdx.endIndex;
+
+        let { hd, bd } = filterData(
+          baseHeaders,
+          baseBody,
+          monthIdx.startIndex + shiftNum,
+          monthIdx.endIndex + 1 + shiftNum
+        );
+
+        const { hElem, bElem } = generateHTMLElem(hd, bd, baseKeyEvent);
+
+        thead.innerHTML = hElem;
+        tbody.innerHTML = bElem;
+      });
       document.getElementById("next").addEventListener("click", function () {
         month = month < 12 ? month + 1 : month;
         const monthIdx = getMonthRangeIndex(
