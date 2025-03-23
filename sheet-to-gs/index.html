@@ -108,6 +108,8 @@
 
         console.log("headD", headD, bodyD);
 
+        console.log("head", headD)
+
         let tHead = headD
           ?.map(
             (h, hIndex) =>
@@ -429,7 +431,6 @@
   </head>
 
   <body onload="renderTable()">
-    <h1>Super Snail SEA Calendar</h1>
     <div class="flex w-[300px] justify-between">
       <button
         id="prev"
@@ -472,13 +473,26 @@
         </ul>
       </div>
     </div>
-    <div class="relative">
-      <img class="absolute bottom-[-2px]" id="reporter" />
+    <div class="relative flex flex-col">
+      <!-- Image and Title Container -->
+      <div class="relative flex flex-col items-center mt-[30px]">
+        <img class="relative" id="reporter" />
+        <div
+          class="border-2 border-[#6e5e55] bg-[#d4b28b] rounded-md w-fit py-2 px-4 z-5 text-center relative top-[-5px]"
+        >
+          <h1 class="text-4xl">Super Snail SEA Calendar</h1>
+        </div>
+      </div>
+
+      <!-- Table Below Image and Title -->
+      <!-- Table Below Image and Title -->
+      <div class="p-4 w-full">
+        <table class="border border-1 mt-[20px] w-full">
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
     </div>
-    <table class="border border-1">
-      <thead id="tableHead"></thead>
-      <tbody id="tableBody"></tbody>
-    </table>
   </body>
   <footer>
     <script>
