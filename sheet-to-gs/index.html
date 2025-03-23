@@ -65,8 +65,6 @@
             let startMonth = dates[0].split("/")[0]; // Extract start month
             let endMonth = dates[1].split("/")[0]; // Extract end month
 
-            console.log("I", i, startMonth, endMonth);
-
             // Find the first occurrence of the target month
             if (
               (startMonth === targetMonth && startIndex === -1) ||
@@ -92,7 +90,11 @@
 
         let fHead = headers.slice(start, end + 1);
         let fBody = bodyData.map((bData) => bData.slice(start, end));
-        // console.log(f)
+
+        if (fHead[0] !== "") {
+          fHead[0] = "";
+        }
+
         return {
           hd: fHead,
           bd: fBody,
@@ -428,9 +430,31 @@
 
   <body onload="renderTable()">
     <h1>Super Snail SEA Calendar</h1>
-    <button id="prev">Prev</button>
-    <div id="currentMonth"></div>
-    <button id="next">Next</button>
+    <div class="flex w-[300px] justify-between">
+      <button
+        id="prev"
+        class="transition-transform duration-300 hover:scale-110 cursor-pointer w-[100px]"
+      >
+        <img
+          src="https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/prev_2.webp"
+        />
+      </button>
+      <button
+        id="next"
+        class="transition-transform duration-300 hover:scale-110 cursor-pointer w-[100px]"
+      >
+        <img
+          src="https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/next_2.webp"
+        />
+      </button>
+    </div>
+    <div>
+        <select id="weekSelect">
+            <option value="week">4 Week</option>
+            <option value="full">Full Week</option>
+        </select>
+    </div>
+    <!-- <div class="relative"><img class="absolute bottom-[-2px]"id="reporter" /> </div> -->
     <table class="border border-1">
       <thead id="tableHead"></thead>
       <tbody id="tableBody"></tbody>
@@ -440,6 +464,32 @@
     <script>
       let thead = document.getElementById("tableHead");
       let tbody = document.getElementById("tableBody");
+
+      document.getElementById("weekSelect").addEventListener("change", function() {
+        monthMode = this.value;
+        const monthIdx = getMonthRangeIndex(
+          baseHeaders,
+          toTwoDigits(month),
+          this.value
+        );
+
+        startIndex = monthIdx.startIndex;
+        endIndex = monthIdx.endIndex;
+        console.log("START", monthIdx)
+        let { hd, bd } = filterData(
+          baseHeaders,
+          baseBody,
+          monthIdx.startIndex,
+          monthIdx.endIndex + 1
+        );
+
+        const { hElem, bElem } = generateHTMLElem(hd, bd, baseKeyEvent);
+
+        thead.innerHTML = hElem;
+        tbody.innerHTML = bElem;
+      })
+
+      //   document.getElementById("reporter").src= reporter;
       document.getElementById("next").addEventListener("click", function () {
         month = month < 12 ? month + 1 : month;
         const monthIdx = getMonthRangeIndex(
@@ -451,17 +501,6 @@
         startIndex = monthIdx.startIndex;
         endIndex = monthIdx.endIndex;
 
-        console.log(
-          "\n============\nnext",
-          "\nmonth",
-          month,
-          "\nstartIndex",
-          startIndex,
-          "\nendIndex",
-          endIndex,
-          "\nmonthIdx",
-          monthIdx
-        );
         let { hd, bd } = filterData(
           baseHeaders,
           baseBody,
@@ -469,17 +508,6 @@
           monthIdx.endIndex + 1
         );
 
-        console.log(
-          "\n====== FILTER =========\n",
-          "\nbaseHeaders",
-          baseHeaders,
-          "\nbaseBody",
-          baseBody,
-          "\nhd",
-          hd,
-          "\nbd",
-          bd
-        );
         const { hElem, bElem } = generateHTMLElem(hd, bd, baseKeyEvent);
 
         thead.innerHTML = hElem;
@@ -496,18 +524,6 @@
         startIndex = monthIdx.startIndex;
         endIndex = monthIdx.endIndex;
 
-        console.log(
-          "\n============\prev",
-          "\nmonth",
-          month,
-          "\nstartIndex",
-          startIndex,
-          "\nendIndex",
-          endIndex,
-          "\nmonthIdx",
-          monthIdx
-        );
-
         let { hd, bd } = filterData(
           baseHeaders,
           baseBody,
@@ -515,17 +531,6 @@
           monthIdx.endIndex + 1
         );
 
-        console.log(
-          "\n====== FILTER =========\n",
-          "\nbaseHeaders",
-          baseHeaders,
-          "\nbaseBody",
-          baseBody,
-          "\nhd",
-          hd,
-          "\nbd",
-          bd
-        );
         const { hElem, bElem } = generateHTMLElem(hd, bd, baseKeyEvent);
 
         thead.innerHTML = hElem;
