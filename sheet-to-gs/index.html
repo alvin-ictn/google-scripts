@@ -27,7 +27,7 @@
 
       const weekly = {
         "Wishing Week":
-          "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/wishing_banner.webp",
+          "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/wishing_banner_2.webp",
         "Lottery Week":
           "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/lottery_banner.webp",
         "Offering Week":
@@ -80,6 +80,36 @@
         };
       };
 
+      const generateHTMLElem = (headD = null, bodyD = null) => {
+        if(!headD || !bodyD) {
+            return {hElem: null, bElem: null}
+        }
+
+        let tHead = headD?.map((h) => `<th>${h}</th>`).join("")
+        let tBody = bodyD
+          .map(
+            (row, rowIdx) =>
+              `<tr>${row
+                .map((cell, cellIdx) => {
+                  return `<td>${
+                    Object.keys(weekly).includes(cell)
+                      ? `<img src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>`
+                      : cell
+                  }</td>`;
+                })
+                .join("")}</tr>`
+          )
+          "<tr>" + headD?.map((h) => `<th>${h}</th>`).join("") + "</tr>";
+
+        let hElem = "<tr>" +tHead+ "</tr>";
+        let bElem = tBody?.join("")
+
+        return {
+            hElem,
+            bElem
+        }
+      };
+
       function modifySheetData(data) {
         let parsedData = JSON.parse(data);
         // Example 1: Remove the first row (headers)
@@ -89,8 +119,10 @@
         return { headers, bodyData }; // Return modified data
       }
 
+
+
       function renderTable() {
-        let data = <?= JSON.stringify(sheetData) ?>; // Get data from Apps Script
+          let data = <?= JSON.stringify(sheetData) ?>; // Get data from Apps Script
         let { headers, bodyData } = modifySheetData(data); // Modify data
         let thead = document.getElementById("tableHead");
         let tbody = document.getElementById("tableBody");
@@ -107,19 +139,10 @@
             monthIdx.endIndex + 1
           );
 
-          thead.innerHTML =
-            "<tr>" + hd.map((h) => `<th>${h}</th>`).join("") + "</tr>";
+          const {hElem,bElem} = generateHTMLElem(hd, bd)
 
-            tbody.innerHTML = bd
-            .map(
-              (row, rowIdx) =>
-                `<tr>${row
-                  .map((cell, cellIdx) => {
-                    return `<td>${Object.keys(weekly).includes(cell) ? `<img src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>` : cell}</td>`;
-                  })
-                  .join("")}</tr>`
-            )
-            .join("");
+          thead.innerHTML = hElem;
+          tbody.innerHTML = bElem;
         });
 
         document.getElementById("prev").addEventListener("click", function () {
@@ -135,20 +158,10 @@
             monthIdx.endIndex + 1
           );
 
-          thead.innerHTML =
-            "<tr>" + hd.map((h) => `<th>${h}</th>`).join("") + "</tr>";
+          const {hElem,bElem} = generateHTMLElem(hd, bd)
 
-          // Render table body
-          tbody.innerHTML = bd
-            .map(
-              (row, rowIdx) =>
-                `<tr>${row
-                  .map((cell, cellIdx) => {
-                    return `<td>${Object.keys(weekly).includes(cell) ? `<img src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>` : cell}</td>`;
-                  })
-                  .join("")}</tr>`
-            )
-            .join("");
+          thead.innerHTML = hElem;
+          tbody.innerHTML = bElem;
         });
         // document.querySelector("#currentMonth").html = `${}`
         console.log("\n\nbodyDaya", bodyData);
@@ -161,15 +174,19 @@
 
         // Render table body
         tbody.innerHTML = bodyData
-            .map(
-              (row, rowIdx) =>
-                `<tr>${row
-                  .map((cell, cellIdx) => {
-                    return `<td>${Object.keys(weekly).includes(cell) ? `<img src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>` : cell}</td>`;
-                  })
-                  .join("")}</tr>`
-            )
-            .join("");
+          .map(
+            (row, rowIdx) =>
+              `<tr>${row
+                .map((cell, cellIdx) => {
+                  return `<td>${
+                    Object.keys(weekly).includes(cell)
+                      ? `<img src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>`
+                      : cell
+                  }</td>`;
+                })
+                .join("")}</tr>`
+          )
+          .join("");
       }
     </script>
   </head>
