@@ -107,7 +107,7 @@
           return { hElem: null, bElem: null };
         }
         const headDLength = headD.length - 1;
-        let width = (window.innerWidth - 132) / headDLength;
+        let width = (window.innerWidth - 148) / headDLength;
 
         let tHead = headD
           ?.map(
@@ -119,14 +119,10 @@
           .join("");
 
         let realBody = key.map((header, index) => [header, ...bodyD[index]]);
-        let columnRowspan = Array(realBody[0].length).fill(1); // Track rowspan for each column
 
         let tBody = realBody.map((row, rowIdx) => {
           return `<tr>${row
             .map((cell, cellIdx) => {
-              //   console.log(cellIdx === 0 ? cell : "NON");
-              //   let combinedCell = rowIdx === 2 ? cell
-              console.log(rowIdx, cellIdx, cell);
               return `<td class="border p-1" ${
                 rowIdx === 2 && `rowspan=${realBody.length - 2}`
               }>
@@ -140,13 +136,13 @@
                         speciesWar[cell.toLocaleLowerCase()]
                       }" alt="${cell}-${rowIdx}-${cellIdx}"/>`
                     : cell.includes("|")
-                    ? `<ul class="list-disc ml-4">${cell
+                    ? `<ul class="list-disc ml-4 flex flex-col gap-2">${cell
                         .split("|")
-                        .map((li) => `<li>${li}</li>`)
+                        .map((li) => `<li><div class="${(cellIdx > 0 && cell !== "") && "p-3 border-2 border-[#cc8a68] bg-[#fae7ad] rounded-md"}">${li}</div></li>`)
                         .join("")}</ul>`
-                    : `<p class="${
+                    : `<div class="${(cellIdx > 0 && cell !== "") && "p-3 border-2 border-[#cc8a68] bg-[#fae7ad] rounded-md"}"><p class="${
                         cellIdx === 0 && "text-lg font-semibold"
-                      }">${cell}</p>`
+                      }">${cell}</p></div>`
                 }</td>`;
             })
             .join("")}</tr>`;
@@ -539,9 +535,9 @@
         </ul>
       </div>
     </div>
-    <div class="relative flex flex-col">
+    <div class="relative flex flex-col bg-[#f7efe4] border-4 rounded-xl m-2 border-[#6e5e55]">
       <!-- Image and Title Container -->
-      <div class="relative flex flex-col items-center mt-[30px]">
+      <div class="relative flex flex-col items-center">
         <img class="relative" id="reporter" />
         <div
           class="border-2 border-[#6e5e55] bg-[#d4b28b] rounded-md w-fit py-2 px-4 z-5 text-center relative top-[-5px]"
@@ -553,7 +549,7 @@
       <!-- Table Below Image and Title -->
       <!-- Table Below Image and Title -->
       <div class="p-4 w-full">
-        <table class="border border-1 mt-[20px] w-full">
+        <table class="border border-1 w-full">
           <thead id="tableHead"></thead>
           <tbody id="tableBody"></tbody>
         </table>
