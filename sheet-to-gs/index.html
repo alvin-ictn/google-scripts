@@ -105,16 +105,14 @@
         if (!headD || !bodyD || !key) {
           return { hElem: null, bElem: null };
         }
-
-        console.log("headD", headD, bodyD);
-
-        console.log("head", headD)
+        const headDLength = headD.length - 1;
+        let width = (window.innerWidth - 132) / headDLength
 
         let tHead = headD
           ?.map(
             (h, hIndex) =>
               `<th class="border ${
-                hIndex === 0 ? "min-w-[200px]" : "min-w-[320px]"
+                hIndex === 0 ? "min-w-[100px]" : `min-w-[${width}px]`
               }">${h}</th>`
           )
           .join("");
@@ -125,7 +123,7 @@
           return `<tr>${row
             .map((cell, cellIdx) => {
               //   console.log(cellIdx === 0 ? cell : "NON");
-              return `<td class="border p-2">${
+              return `<td class="border p-1">${
                 Object.keys(weekly).includes(cell)
                   ? `<img class="weekly-banner" src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>`
                   : `<p class="${
