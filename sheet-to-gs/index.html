@@ -6,12 +6,16 @@
       href="https://fonts.googleapis.com/css2?family=Winky+Sans:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
       body {
         font-family: "Winky Sans", sans-serif;
       }
     </style>
     <script>
+      const reporter =
+        "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/reporter.webp";
       const speciesWar = {
         goldfish:
           "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/goldfish.webp",
@@ -39,154 +43,385 @@
       }
       let month = 1,
         startIndex = -1,
-        endIndex = -1;
+        endIndex = -1,
+        monthMode = "week",
+        baseHeaders = null,
+        baseBody = null,
+        baseKeyEvent = null;
 
-      function getMonthRangeIndex(data, targetMonth) {
+      function getMonthRangeIndex(data, targetMonth, mode = "full") {
         let startIndex = -1,
           endIndex = -1;
 
-        for (let i = 0; i < data.length; i++) {
-          let range = data[i].trim();
-          if (!range) continue; // Skip empty values
+        if (mode === "week") {
+          startIndex = (parseInt(targetMonth) - 1) * 4;
+          endIndex = (parseInt(targetMonth) - 1) * 4 + 3;
+        } else {
+          for (let i = 0; i < data.length; i++) {
+            let range = data[i].trim();
+            if (!range) continue; // Skip empty values
 
-          let dates = range.split(" - ");
-          let startMonth = dates[0].split("/")[0]; // Extract start month
-          let endMonth = dates[1].split("/")[0]; // Extract end month
+            let dates = range.split(" - ");
+            let startMonth = dates[0].split("/")[0]; // Extract start month
+            let endMonth = dates[1].split("/")[0]; // Extract end month
 
-          console.log("I", i, startMonth, endMonth);
+            console.log("I", i, startMonth, endMonth);
 
-          // Find the first occurrence of the target month
-          if (
-            (startMonth === targetMonth && startIndex === -1) ||
-            (endMonth === targetMonth && startIndex === -1)
-          ) {
-            startIndex = i;
-          }
+            // Find the first occurrence of the target month
+            if (
+              (startMonth === targetMonth && startIndex === -1) ||
+              (endMonth === targetMonth && startIndex === -1)
+            ) {
+              startIndex = i;
+            }
 
-          // Find the last occurrence of the target month
-          if (startMonth === targetMonth || endMonth === targetMonth) {
-            endIndex = i;
+            // Find the last occurrence of the target month
+            if (startMonth === targetMonth || endMonth === targetMonth) {
+              endIndex = i;
+            }
           }
         }
+
         return { startIndex, endIndex };
       }
 
       const filterData = (headers, bodyData, start, end) => {
+        if (headers[0] !== "") {
+          headers.unshift("");
+        }
+
         let fHead = headers.slice(start, end + 1);
-        let fBody = bodyData.map((bData) => bData.slice(start, end + 1));
+        let fBody = bodyData.map((bData) => bData.slice(start, end));
+        // console.log(f)
         return {
           hd: fHead,
           bd: fBody,
         };
       };
 
-      const generateHTMLElem = (headD = null, bodyD = null) => {
-        if(!headD || !bodyD) {
-            return {hElem: null, bElem: null}
+      const generateHTMLElem = (headD = null, bodyD = null, key = null) => {
+        if (!headD || !bodyD || !key) {
+          return { hElem: null, bElem: null };
         }
 
-        let tHead = headD?.map((h) => `<th>${h}</th>`).join("")
-        let tBody = bodyD
-          .map(
-            (row, rowIdx) =>
-              `<tr>${row
-                .map((cell, cellIdx) => {
-                  return `<td>${
-                    Object.keys(weekly).includes(cell)
-                      ? `<img src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>`
-                      : cell
-                  }</td>`;
-                })
-                .join("")}</tr>`
-          )
-          "<tr>" + headD?.map((h) => `<th>${h}</th>`).join("") + "</tr>";
+        console.log("headD", headD, bodyD);
 
-        let hElem = "<tr>" +tHead+ "</tr>";
-        let bElem = tBody?.join("")
+        let tHead = headD
+          ?.map(
+            (h, hIndex) =>
+              `<th class="border ${
+                hIndex === 0 ? "min-w-[200px]" : "min-w-[320px]"
+              }">${h}</th>`
+          )
+          .join("");
+
+        let realBody = key.map((header, index) => [header, ...bodyD[index]]);
+
+        let tBody = realBody.map((row, rowIdx) => {
+          return `<tr>${row
+            .map((cell, cellIdx) => {
+              //   console.log(cellIdx === 0 ? cell : "NON");
+              return `<td class="border p-2">${
+                Object.keys(weekly).includes(cell)
+                  ? `<img class="weekly-banner" src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>`
+                  : `<p class="${
+                      cellIdx === 0 && "text-lg font-semibold"
+                    }">${cell}</p>`
+              }</td>`;
+            })
+            .join("")}</tr>`;
+        });
+        "<tr>" + headD?.map((h) => `<th>${h}</th>`).join("") + "</tr>";
+
+        let hElem = "<tr>" + tHead + "</tr>";
+        let bElem = tBody?.join("");
 
         return {
-            hElem,
-            bElem
-        }
+          hElem,
+          bElem,
+        };
       };
 
       function modifySheetData(data) {
-        let parsedData = JSON.parse(data);
+        console.log(typeof data);
+        let parsedData = typeof data === "object" ? data : JSON.parse(data);
         // Example 1: Remove the first row (headers)
         let headers = parsedData[0]; // Keep headers for the table
-        let bodyData = parsedData.slice(1); // Remove first row
+        let rawBody = parsedData.slice(1); // Remove first row
+        let keyEvent = rawBody.map((row) => row[0]); // First element from each row
+        let bodyData = rawBody.map((row) => row.slice(1)); // Everything except the first element
 
-        return { headers, bodyData }; // Return modified data
+        return { headers, bodyData, keyEvent }; // Return modified data
       }
 
-
-
       function renderTable() {
-          let data = <?= JSON.stringify(sheetData) ?>; // Get data from Apps Script
-        let { headers, bodyData } = modifySheetData(data); // Modify data
-        let thead = document.getElementById("tableHead");
-        let tbody = document.getElementById("tableBody");
+        //   let data = <?= JSON.stringify(sheetData) ?>; // Get data from Apps Script
+        const data = [
+          [
+            "",
+            "12/30 - 01/05",
+            "01/06 - 01/12",
+            "01/13 - 01/19",
+            "01/20 - 01/26",
+            "01/27 - 02/02",
+            "02/03 - 02/09",
+            "02/10 - 02/16",
+            "02/17 - 02/23",
+            "02/24 - 03/02",
+            "03/03 - 03/09",
+            "03/10 - 03/16",
+            "03/17 - 03/23",
+            "03/24 - 03/30",
+            "03/31 - 04/06",
+            "04/07 - 04/13",
+            "04/14 - 04/20",
+            "04/21 - 04/27",
+            "04/28 - 05/04",
+            "05/05 - 05/11",
+            "05/12 - 05/18",
+            "05/19 - 05/25",
+            "05/26 - 06/01",
+            "06/02 - 06/08",
+            "06/09 - 06/15",
+            "06/16 - 06/22",
+            "06/23 - 06/29",
+            "06/30 - 07/06",
+            "07/07 - 07/13",
+            "07/14 - 07/20",
+            "07/21 - 07/27",
+            "07/28 - 08/03",
+            "08/04 - 08/10",
+            "08/11 - 08/17",
+            "08/18 - 08/24",
+            "08/25 - 08/31",
+            "09/01 - 09/07",
+            "09/08 - 09/14",
+            "09/15 - 09/21",
+            "09/22 - 09/28",
+          ],
+          [
+            "Weekly Event",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "",
+          ],
+          [
+            "Species War",
+            "Hamster",
+            "Mantis",
+            "Dung Beetles",
+            "Goldfish",
+            "",
+            "Hamster",
+            "Mantis",
+            "Dung Beetles",
+            "Goldfish",
+            "Surf Clams",
+            "Hamster",
+            "",
+            "",
+            "",
+            "",
+            "Hamster",
+            "Mantis",
+            "Dung Beetles",
+            "Goldfish",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+          ],
+          [
+            "Game Utilities",
+            "Partner Album",
+            "Avatar Group\nOpen Chest in Batch",
+            "Dung Beetle Chronicle Ranking",
+            "Species Map Upgrade",
+            " Hellenic Domain",
+            "Control Panel",
+            "No updates",
+            "Species war F21-F24",
+            "Unlock Partner (Baby Eater)",
+            "Unlock Special Hitman(Leader of the Gourmets Guild, Dead Knight, Duchy Emissary)",
+            "Tiny World",
+            "",
+            "",
+            "",
+            "",
+            "Clone War",
+            "Protomon Update                                 The 3rd Lottery Machine                                      Furnace Upgrade",
+            "New version of Organs&Gene Evolution",
+            "nothing yet",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "Explore\n（Time Rift lvl 1-240）",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "Mini game:Master Decoder",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+          ],
+        ];
 
-        document.getElementById("next").addEventListener("click", function () {
-          month = month < 12 ? month + 1 : month;
-          const monthIdx = getMonthRangeIndex(headers, toTwoDigits(month));
-          startIndex = monthIdx.startIndex;
-          endIndex = monthIdx.endIndex;
-          let { hd, bd } = filterData(
-            headers,
-            bodyData,
-            monthIdx.startIndex,
-            monthIdx.endIndex + 1
-          );
+        let { headers, bodyData, keyEvent } = modifySheetData(data); // Modify data
 
-          const {hElem,bElem} = generateHTMLElem(hd, bd)
+        baseHeaders = headers;
+        baseBody = bodyData;
+        baseKeyEvent = keyEvent;
 
-          thead.innerHTML = hElem;
-          tbody.innerHTML = bElem;
-        });
-
-        document.getElementById("prev").addEventListener("click", function () {
-          month = month > 1 ? month - 1 : month;
-          const monthIdx = getMonthRangeIndex(headers, toTwoDigits(month));
-          startIndex = monthIdx.startIndex;
-          endIndex = monthIdx.endIndex;
-          console.log(month, startIndex, endIndex, monthIdx);
-          let { hd, bd } = filterData(
-            headers,
-            bodyData,
-            monthIdx.startIndex,
-            monthIdx.endIndex + 1
-          );
-
-          const {hElem,bElem} = generateHTMLElem(hd, bd)
-
-          thead.innerHTML = hElem;
-          tbody.innerHTML = bElem;
-        });
         // document.querySelector("#currentMonth").html = `${}`
-        console.log("\n\nbodyDaya", bodyData);
+        const { hElem, bElem } = generateHTMLElem(headers, bodyData, keyEvent);
 
-        // Get table elements
-
-        // Render table headers
-        thead.innerHTML =
-          "<tr>" + headers.map((h) => `<th>${h}</th>`).join("") + "</tr>";
-
-        // Render table body
-        tbody.innerHTML = bodyData
-          .map(
-            (row, rowIdx) =>
-              `<tr>${row
-                .map((cell, cellIdx) => {
-                  return `<td>${
-                    Object.keys(weekly).includes(cell)
-                      ? `<img src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>`
-                      : cell
-                  }</td>`;
-                })
-                .join("")}</tr>`
-          )
-          .join("");
+        thead.innerHTML = hElem;
+        tbody.innerHTML = bElem;
       }
     </script>
   </head>
@@ -196,9 +431,106 @@
     <button id="prev">Prev</button>
     <div id="currentMonth"></div>
     <button id="next">Next</button>
-    <table border="1">
+    <table class="border border-1">
       <thead id="tableHead"></thead>
       <tbody id="tableBody"></tbody>
     </table>
   </body>
+  <footer>
+    <script>
+      let thead = document.getElementById("tableHead");
+      let tbody = document.getElementById("tableBody");
+      document.getElementById("next").addEventListener("click", function () {
+        month = month < 12 ? month + 1 : month;
+        const monthIdx = getMonthRangeIndex(
+          baseHeaders,
+          toTwoDigits(month),
+          monthMode
+        );
+
+        startIndex = monthIdx.startIndex;
+        endIndex = monthIdx.endIndex;
+
+        console.log(
+          "\n============\nnext",
+          "\nmonth",
+          month,
+          "\nstartIndex",
+          startIndex,
+          "\nendIndex",
+          endIndex,
+          "\nmonthIdx",
+          monthIdx
+        );
+        let { hd, bd } = filterData(
+          baseHeaders,
+          baseBody,
+          monthIdx.startIndex,
+          monthIdx.endIndex + 1
+        );
+
+        console.log(
+          "\n====== FILTER =========\n",
+          "\nbaseHeaders",
+          baseHeaders,
+          "\nbaseBody",
+          baseBody,
+          "\nhd",
+          hd,
+          "\nbd",
+          bd
+        );
+        const { hElem, bElem } = generateHTMLElem(hd, bd, baseKeyEvent);
+
+        thead.innerHTML = hElem;
+        tbody.innerHTML = bElem;
+      });
+
+      document.getElementById("prev").addEventListener("click", function () {
+        month = month > 1 ? month - 1 : month;
+        const monthIdx = getMonthRangeIndex(
+          baseHeaders,
+          toTwoDigits(month),
+          monthMode
+        );
+        startIndex = monthIdx.startIndex;
+        endIndex = monthIdx.endIndex;
+
+        console.log(
+          "\n============\prev",
+          "\nmonth",
+          month,
+          "\nstartIndex",
+          startIndex,
+          "\nendIndex",
+          endIndex,
+          "\nmonthIdx",
+          monthIdx
+        );
+
+        let { hd, bd } = filterData(
+          baseHeaders,
+          baseBody,
+          monthIdx.startIndex,
+          monthIdx.endIndex + 1
+        );
+
+        console.log(
+          "\n====== FILTER =========\n",
+          "\nbaseHeaders",
+          baseHeaders,
+          "\nbaseBody",
+          baseBody,
+          "\nhd",
+          hd,
+          "\nbd",
+          bd
+        );
+        const { hElem, bElem } = generateHTMLElem(hd, bd, baseKeyEvent);
+
+        thead.innerHTML = hElem;
+        tbody.innerHTML = bElem;
+      });
+    </script>
+  </footer>
 </html>
