@@ -418,9 +418,26 @@
         baseHeaders = headers;
         baseBody = bodyData;
         baseKeyEvent = keyEvent;
+        console.log("")
+
+        const monthIdx = getMonthRangeIndex(
+            baseHeaders,
+            toTwoDigits(month),
+            monthMode
+          );
+
+          startIndex = monthIdx.startIndex;
+          endIndex = monthIdx.endIndex;
+
+          let { hd, bd } = filterData(
+            baseHeaders,
+            baseBody,
+            monthIdx.startIndex,
+            monthIdx.endIndex + 1
+          );
 
         // document.querySelector("#currentMonth").html = `${}`
-        const { hElem, bElem } = generateHTMLElem(headers, bodyData, keyEvent);
+        const { hElem, bElem } = generateHTMLElem(hd, bd, keyEvent);
 
         thead.innerHTML = hElem;
         tbody.innerHTML = bElem;
@@ -454,8 +471,8 @@
         onmouseover="showTooltip()"
         onmouseout="hideTooltip()"
       >
+      <option value="week">4 Weeks</option>
         <option value="full">Full Week</option>
-        <option value="week">4 Weeks</option>
       </select>
       <div
         id="tooltip"
