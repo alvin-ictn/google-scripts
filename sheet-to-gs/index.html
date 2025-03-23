@@ -12,6 +12,27 @@
       }
     </style>
     <script>
+      const speciesWar = {
+        goldfish:
+          "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/goldfish.webp",
+        "dung bettles":
+          "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/dung%20beetles.webp",
+        hamster:
+          "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/hamster.webp",
+        mantis:
+          "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/mantis.webp",
+        "surf clams":
+          "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/surf%20clams.webp",
+      };
+
+      const weekly = {
+        "Wishing Week":
+          "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/wishing_banner.webp",
+        "Lottery Week":
+          "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/lottery_banner.webp",
+        "Offering Week":
+          "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/offering_banner.webp",
+      };
       // Function to modify sheetData before displaying it
       function toTwoDigits(num) {
         return num.toString().padStart(2, "0");
@@ -89,10 +110,14 @@
           thead.innerHTML =
             "<tr>" + hd.map((h) => `<th>${h}</th>`).join("") + "</tr>";
 
-          tbody.innerHTML = bd
+            tbody.innerHTML = bd
             .map(
-              (row) =>
-                `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`
+              (row, rowIdx) =>
+                `<tr>${row
+                  .map((cell, cellIdx) => {
+                    return `<td>${Object.keys(weekly).includes(cell) ? `<img src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>` : cell}</td>`;
+                  })
+                  .join("")}</tr>`
             )
             .join("");
         });
@@ -102,7 +127,7 @@
           const monthIdx = getMonthRangeIndex(headers, toTwoDigits(month));
           startIndex = monthIdx.startIndex;
           endIndex = monthIdx.endIndex;
-          console.log(month, startIndex, endIndex, monthIdx)
+          console.log(month, startIndex, endIndex, monthIdx);
           let { hd, bd } = filterData(
             headers,
             bodyData,
@@ -116,8 +141,12 @@
           // Render table body
           tbody.innerHTML = bd
             .map(
-              (row) =>
-                `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`
+              (row, rowIdx) =>
+                `<tr>${row
+                  .map((cell, cellIdx) => {
+                    return `<td>${Object.keys(weekly).includes(cell) ? `<img src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>` : cell}</td>`;
+                  })
+                  .join("")}</tr>`
             )
             .join("");
         });
@@ -132,11 +161,15 @@
 
         // Render table body
         tbody.innerHTML = bodyData
-          .map(
-            (row) =>
-              `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`
-          )
-          .join("");
+            .map(
+              (row, rowIdx) =>
+                `<tr>${row
+                  .map((cell, cellIdx) => {
+                    return `<td>${Object.keys(weekly).includes(cell) ? `<img src="${weekly[cell]}" alt="${cell}-${rowIdx}-${cellIdx}"/>` : cell}</td>`;
+                  })
+                  .join("")}</tr>`
+            )
+            .join("");
       }
     </script>
   </head>
