@@ -13,6 +13,11 @@
         font-family: "Winky Sans", sans-serif;
       }
     </style>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <script>
       const reporter =
         "https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/reporter.webp";
@@ -41,7 +46,15 @@
       function toTwoDigits(num) {
         return num.toString().padStart(2, "0");
       }
-      let month = 1,
+      function getWeekDifference(startDate, endDate, startOnSunday = false, diff = "weeks") {
+        let start = moment(startDate).startOf(
+          startOnSunday ? "week" : "isoWeek"
+        );
+        let end = moment(endDate).startOf(startOnSunday ? "week" : "isoWeek");
+
+        return end.diff(start, diff);
+      }
+      let month = getWeekDifference("2024-12-20", moment().format("YYYY-MM-DD"), false, "months") + 1 || 1,
         startIndex = -1,
         endIndex = -1,
         monthMode = "week",
@@ -171,7 +184,7 @@
 
       function modifySheetData(data) {
         let parsedData = typeof data === "object" ? data : JSON.parse(data);
-        data = typeof data === "object" ? data : JSON.parse(data)
+        data = typeof data === "object" ? data : JSON.parse(data);
         // Example 1: Remove the first row (headers)
         let headers = parsedData[0]; // Keep headers for the table
         let rawBody = parsedData.slice(1); // Remove first row
@@ -183,7 +196,260 @@
 
       function renderTable() {
         // let data = <?= JSON.stringify(sheetData) ?>; // Get data from Apps Script
-        let data = [["","12/20 - 12/26","12/27 - 01/02","01/03 - 01/09","01/10 - 01/16","01/17 - 01/23","01/24 - 01/30","01/31 - 02/06","02/07 - 02/13","02/14 - 02/20","02/21 - 02/27","02/28 - 03/06","03/07 - 03/13","03/14 - 03/20","03/21 - 03/27","03/28 - 04/03","04/04 - 04/10","04/11 - 04/17","04/18 - 04/24","04/25 - 05/01","05/02 - 05/08","05/09 - 05/15","05/16 - 05/22","05/23 - 05/29","05/30 - 06/05","06/06 - 06/12","06/13 - 06/19","06/20 - 06/26","06/27 - 07/03","07/04 - 07/10","07/11 - 07/17","07/18 - 07/24","07/25 - 07/31","08/01 - 08/07","08/08 - 08/14","08/15 - 08/21","08/22 - 08/28","08/29 - 09/04","09/05 - 09/11","09/12 - 09/18"],["Weekly Event","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week","Wishing Week","Offering Week","Lottery Week",""],["Species War","Hamster","Mantis","Dung Beetles","Goldfish","","Hamster","Mantis","Dung Beetles","Goldfish","Surf Clams","Hamster","","","Goldfish","Surf Clams","Hamster","Mantis","Dung Beetles","Goldfish","Surf Clams","Hamster","Mantis","Dung Beetles","Goldfish","Surf Clams","Hamster","Mantis","Dung Beetles","Goldfish","","","","","","","","","",""],["Game Utilities","Partner Album","Avatar Group\nOpen Chest in Batch","Dung Beetle Chronicle Ranking","Species Map Upgrade"," Hellenic Domain","Control Panel","No updates","Species war F21-F24","Unlock Partner (Baby Eater)","Unlock Special Hitman(Leader of the Gourmets Guild, Dead Knight, Duchy Emissary)","Tiny World","","","","","Clone War","Protomon Update                             ","Organ&Gene Rework","1st Anniversary","Godhood(T1-T4)\n","","","","","","","","","","","","","","","","","","",""],["","","","","","","","","","Explore\n（Time Rift lvl 1-240）","","","","","","","","The 3rd Lottery Machine ","","","","","","","","","","","","","","","","","","","","","",""],["","","","","","","","","","Mini game:Master Decoder","","","","","","","","  Furnace Upgrade","","","","","","","","","","","","","","","","","","","","","",""]]
+        let data = [
+          [
+            "",
+            "12/20 - 12/26",
+            "12/27 - 01/02",
+            "01/03 - 01/09",
+            "01/10 - 01/16",
+            "01/17 - 01/23",
+            "01/24 - 01/30",
+            "01/31 - 02/06",
+            "02/07 - 02/13",
+            "02/14 - 02/20",
+            "02/21 - 02/27",
+            "02/28 - 03/06",
+            "03/07 - 03/13",
+            "03/14 - 03/20",
+            "03/21 - 03/27",
+            "03/28 - 04/03",
+            "04/04 - 04/10",
+            "04/11 - 04/17",
+            "04/18 - 04/24",
+            "04/25 - 05/01",
+            "05/02 - 05/08",
+            "05/09 - 05/15",
+            "05/16 - 05/22",
+            "05/23 - 05/29",
+            "05/30 - 06/05",
+            "06/06 - 06/12",
+            "06/13 - 06/19",
+            "06/20 - 06/26",
+            "06/27 - 07/03",
+            "07/04 - 07/10",
+            "07/11 - 07/17",
+            "07/18 - 07/24",
+            "07/25 - 07/31",
+            "08/01 - 08/07",
+            "08/08 - 08/14",
+            "08/15 - 08/21",
+            "08/22 - 08/28",
+            "08/29 - 09/04",
+            "09/05 - 09/11",
+            "09/12 - 09/18",
+          ],
+          [
+            "Weekly Event",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "Wishing Week",
+            "Offering Week",
+            "Lottery Week",
+            "",
+          ],
+          [
+            "Species War",
+            "Hamster",
+            "Mantis",
+            "Dung Beetles",
+            "Goldfish",
+            "",
+            "Hamster",
+            "Mantis",
+            "Dung Beetles",
+            "Goldfish",
+            "Surf Clams",
+            "Hamster",
+            "",
+            "",
+            "Goldfish",
+            "Surf Clams",
+            "Hamster",
+            "Mantis",
+            "Dung Beetles",
+            "Goldfish",
+            "Surf Clams",
+            "Hamster",
+            "Mantis",
+            "Dung Beetles",
+            "Goldfish",
+            "Surf Clams",
+            "Hamster",
+            "Mantis",
+            "Dung Beetles",
+            "Goldfish",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+          ],
+          [
+            "Game Utilities",
+            "Partner Album",
+            "Avatar Group\nOpen Chest in Batch",
+            "Dung Beetle Chronicle Ranking",
+            "Species Map Upgrade",
+            " Hellenic Domain",
+            "Control Panel",
+            "No updates",
+            "Species war F21-F24",
+            "Unlock Partner (Baby Eater)",
+            "Unlock Special Hitman(Leader of the Gourmets Guild, Dead Knight, Duchy Emissary)",
+            "Tiny World",
+            "",
+            "",
+            "",
+            "",
+            "Clone War",
+            "Protomon Update                             ",
+            "Organ&Gene Rework",
+            "1st Anniversary",
+            "Godhood(T1-T4)\n",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "Explore\n（Time Rift lvl 1-240）",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "The 3rd Lottery Machine ",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "Mini game:Master Decoder",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "  Furnace Upgrade",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+          ],
+        ];
         data[3] = data[3].map((cell, col) =>
           col === 0
             ? cell
@@ -203,7 +469,7 @@
         baseHeaders = headers;
         baseBody = bodyData;
         baseKeyEvent = keyEvent;
-        
+
         const monthIdx = getMonthRangeIndex(
           baseHeaders,
           toTwoDigits(month),
@@ -231,76 +497,78 @@
 
   <body onload="renderTable()">
     <div>
-        <div class="flex items-center flex-col gap-2">
-      <div class="flex w-[300px] justify-between">
-        <button
-          id="prev"
-          class="transition-transform duration-300 hover:scale-110 cursor-pointer w-[100px]"
-        >
-          <img
-            src="https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/prev_2.webp"
-          />
-        </button>
-        <button
-          id="next"
-          class="transition-transform duration-300 hover:scale-110 cursor-pointer w-[100px]"
-        >
-          <img
-            src="https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/next_2.webp"
-          />
-        </button>
-      </div>
-      <div class="tooltip-container relative">
-        <div class="relative">
-          <label>Calendar show</label>
-          <select
-            id="weekSelect"
-            class="border border-[#6e5e55] rounded-md p-2 cursor-pointer"
-            onmouseover="showTooltip()"
-            onmouseout="hideTooltip()"
+      <div class="flex items-center flex-col gap-2">
+        <div class="flex w-[300px] justify-between">
+          <button
+            id="prev"
+            class="transition-transform duration-300 hover:scale-110 cursor-pointer w-[100px]"
           >
-            <option value="week">4 Weeks</option>
-            <option value="full">Full Week</option>
-          </select>
+            <img
+              src="https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/prev_2.webp"
+            />
+          </button>
+          <button
+            id="next"
+            class="transition-transform duration-300 hover:scale-110 cursor-pointer w-[100px]"
+          >
+            <img
+              src="https://zbkwzidcrqhucyhodzkc.supabase.co/storage/v1/object/public/super-snail/calendar/next_2.webp"
+            />
+          </button>
         </div>
-        <div class="flex gap-4" id="shift-container">
-          <p>Shift</p>
-          <div class="flex gap-2">
-            <button
-              class="px-2 border border-[#6e5e55] bg-[#d4b28b] rounded-md cursor-pointer"
-              id="shift-left"
+        <div class="tooltip-container relative">
+          <div class="relative">
+            <label>Calendar show</label>
+            <select
+              id="weekSelect"
+              class="border border-[#6e5e55] rounded-md p-2 cursor-pointer"
+              onmouseover="showTooltip()"
+              onmouseout="hideTooltip()"
             >
-              ❰
-            </button>
-            <button
-              class="px-2 border border-[#6e5e55] bg-[#d4b28b] rounded-md cursor-pointer"
-              id="shift-right"
-            >
-              ❱
-            </button>
+              <option value="week">4 Weeks</option>
+              <option value="full">Full Week</option>
+            </select>
           </div>
-        </div>
-        <div
-          id="tooltip"
-          class="absolute invisible p-2 bg-[#d4b28b] top-[5px] left-[210px] rounded-md border-[2px] border-[#6e5e55] w-full z-10"
-        >
-          <ul>
-            <li>
-              <span><b>Full Week</b> - will show all week in single month</span>
-            </li>
-            <li>
-              <span
-                ><b>4 Weeks</b> - will show only 4 weeks in single month</span
+          <div class="flex gap-4" id="shift-container">
+            <p>Shift</p>
+            <div class="flex gap-2">
+              <button
+                class="px-2 border border-[#6e5e55] bg-[#d4b28b] rounded-md cursor-pointer"
+                id="shift-left"
               >
-            </li>
-          </ul>
+                ❰
+              </button>
+              <button
+                class="px-2 border border-[#6e5e55] bg-[#d4b28b] rounded-md cursor-pointer"
+                id="shift-right"
+              >
+                ❱
+              </button>
+            </div>
+          </div>
+          <div
+            id="tooltip"
+            class="absolute invisible p-2 bg-[#d4b28b] top-[5px] left-[210px] rounded-md border-[2px] border-[#6e5e55] w-full z-10"
+          >
+            <ul>
+              <li>
+                <span
+                  ><b>Full Week</b> - will show all week in single month</span
+                >
+              </li>
+              <li>
+                <span
+                  ><b>4 Weeks</b> - will show only 4 weeks in single month</span
+                >
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-</div>
-  
+
     <div
-        id="capture"
+      id="capture"
       class="relative flex flex-col bg-[#f7efe4] border-4 rounded-xl m-2 border-[#6e5e55]"
     >
       <!-- Image and Title Container -->
@@ -321,7 +589,10 @@
           <tbody id="tableBody"></tbody>
         </table>
       </div>
-      <p class="text-xl text-red m-3 p-2">* Update maybe be subject to changes. For accurate updates, kindly refer to the in-game mail</p>
+      <p class="text-xl text-red m-3 p-2">
+        * Update maybe be subject to changes. For accurate updates, kindly refer
+        to the in-game mail
+      </p>
     </div>
   </body>
   <footer>
